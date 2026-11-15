@@ -108,8 +108,9 @@ def train_sft(
             data_iter = iter(loader)
             batch = next(data_iter)
 
-        input_ids = batch["input_ids"].to(device)
-        labels = batch["labels"].to(device)
+        input_ids, labels = batch
+        input_ids = input_ids.to(device)
+        labels = labels.to(device)
 
         optimizer.zero_grad(set_to_none=True)
         loss = compute_sft_loss(model, input_ids, labels)
