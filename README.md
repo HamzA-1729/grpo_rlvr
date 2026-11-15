@@ -88,11 +88,12 @@ Exhaustive enumeration over 4 operands (`1..12`) and targets (`1..100`) yields *
 | **SFT Compute-Matched (`+300` steps)** | 42 | `0.040` | `0.122` | `0.998` | `46.2` | `0.000` |
 | **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 42 | `0.032` | `0.098` | `1.000` | `45.9` | `0.000` |
 | **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 1337 | `0.042` | `0.086` | `0.998` | `46.1` | `0.000` |
+| **Dr. GRPO Aggressive (`150` steps, `lr=3e-4, beta_kl=0.005, mu=4`)** | 42 | `0.002` | `0.020` | `0.994` | `45.8` | — |
 
 ### Diagnostic Findings
 * **Format & Stopping Mastery:** SFT warmstart reaches `0.998` format compliance and `0.000` truncation (`MeanLen = 45.9 <= 96`), passing the learnability gate with a `>3x` exploration gap (`Pass@1 = 3.8%` vs. `Pass@8 = 12.0%`).
 * **Zero-Variance Group Bottleneck (`z_std`):** At `Pass@8 = 12.0%` and `G = 8`, `~75%–94%` of prompt groups per batch produce uniform rewards (`z_std`), yielding zero advantage signal on those groups.
-* **Tight KL Anchoring:** With `lr = 1e-4`, `beta_kl = 0.04`, `mu_iters = 2`, and Dr. GRPO `1 / max_new_tokens` (`1 / 96`) scaling, `KL` remained `< 5e-5` (`0.0000` logged) and `clip_frac = 0.000` across all 150 steps—keeping `pi_theta` tightly anchored near `pi_ref` (mean GRPO `Pass@1 = 0.037` vs. `0.040` compute-matched SFT).
+* **KL Regularization Sensitivity:** At `lr = 1e-4, beta_kl = 0.04, mu_iters = 2`, Dr. GRPO stayed stable (`Format = 0.998–1.000`, `Pass@1 = 0.032 / 0.042`), whereas weakening the KL anchor (`beta_kl = 0.005, lr = 3e-4, mu_iters = 4`) caused policy collapse (`Pass@1` dropped to `0.002`, `Pass@8` to `0.020`).
 
 ---
 
