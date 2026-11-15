@@ -108,6 +108,7 @@ def grpo_step(
         log_pi_ref = compute_sequence_logprobs(ref_model, rollout.sequences, rollout.prompt_len)
 
     last_stats: dict[str, float] = {}
+    last_loss = 0.0
     policy_model.train()
     for _ in range(mu_iters):
         log_pi_theta = compute_sequence_logprobs(policy_model, rollout.sequences, rollout.prompt_len)
@@ -127,6 +128,7 @@ def grpo_step(
         loss.backward()
         torch.nn.utils.clip_grad_norm_(policy_model.parameters(), max_norm=grad_clip)
         optimizer.step()
+        last_loss = float(loss.item())
 
     total_rollouts = bsz * group_size
     mean_len = float(rollout.completion_mask.sum(dim=1).mean().item())
@@ -137,9 +139,9 @@ def grpo_step(
         "trunc_rate": trunc_hits / total_rollouts,
         "zero_std_frac": zero_std_frac,
         "mean_completion_len": mean_len,
-        "loss": last_stats.get("loss", 0.0),
-        "kl": last_stats.get("kl", 0.0),
-        "clip_frac": last_stats.get("clip_frac", 0.0),
+        "loss": last_loss,
+        "kl": last_stats["mean_k3_kl"],
+        "clip_frac": last_stats["clip_fraction"],
         "step_time_sec": time.perf_counter() - t0,
     }
 
