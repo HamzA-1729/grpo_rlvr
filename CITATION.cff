@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "grpo_rlvr: Group Relative Policy Optimization with Verifiable Rewards from Scratch"
+authors:
+  - alias: "HamzA-1729"
+repository-code: "https://github.com/HamzA-1729/grpo_rlvr"
+license: MIT
+keywords:
+  - reinforcement-learning
+  - grpo
+  - rlvr
+  - pytorch
+  - reasoning

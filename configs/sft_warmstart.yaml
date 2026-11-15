@@ -1,0 +1,37 @@
+# ==============================================================================
+# SFT Warmstart Configuration: R1-Style Countdown Arithmetic Synthesis
+# ==============================================================================
+
+seed: 42
+
+model:
+  vocab_size: 40            # Compact deterministic char/tag vocabulary (auto-synced with tokenizer)
+  max_seq_len: 128          # Fixed prompt (20) + completion (up to 96) = 116 <= 128
+  hidden_dim: 256
+  depth: 4
+  n_heads: 8
+  n_kv_heads: 2
+  head_dim: 32
+  ffn_dim: 768
+  rope_theta: 10000.0
+  norm_eps: 1.0e-6
+
+data:
+  num_operands: 4
+  min_operand: 1
+  max_operand: 12
+  min_target: 1
+  max_target: 100
+  sft_train_size: 2000
+  grpo_train_size: 2000
+  eval_size: 500
+  prompt_len: 20
+
+training:
+  batch_size: 32
+  max_steps: 400
+  lr: 5.0e-4
+  weight_decay: 0.01
+  grad_clip: 1.0
+  eval_interval: 50
+  checkpoint_path: "checkpoints/sft_model.pt"

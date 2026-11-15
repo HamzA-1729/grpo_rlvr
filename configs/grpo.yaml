@@ -1,0 +1,32 @@
+# ==============================================================================
+# GRPO / Dr. GRPO RLVR Configuration: Countdown Arithmetic Synthesis
+# ==============================================================================
+
+seed: 42
+seeds: [42, 1337]
+
+model:
+  sft_checkpoint_path: "checkpoints/sft_model.pt"
+  max_seq_len: 128
+
+rollout:
+  prompts_per_step: 16
+  group_size: 8             # G = 8 completions per prompt (128 rollouts/step)
+  max_new_tokens: 96        # prompt (20) + max_new_tokens (96) = 116 <= 128
+  temperature: 1.0          # Must be 1.0 so sampling matches pi_old
+  top_p: 1.0                # Must be 1.0 (no nucleus truncation during rollouts)
+
+grpo:
+  max_steps: 150
+  mu_iters: 2               # Inner policy update epochs per rollout batch
+  lr: 1.0e-4
+  weight_decay: 0.0
+  grad_clip: 1.0
+  eps_clip: 0.2
+  beta_kl: 0.04
+  kl_clamp: 20.0            # Clamp log(pi_ref / pi_theta) to [-20, 20] before exp
+  normalize_std: false      # Dr. GRPO default (false) removes difficulty std bias
+  length_norm_mode: "constant"  # "constant" (Dr. GRPO) or "sequence" (standard GRPO)
+  format_only: false        # Set true for fast format-compliance integration sanity test
+  eval_interval: 25
+  checkpoint_dir: "checkpoints/grpo"
