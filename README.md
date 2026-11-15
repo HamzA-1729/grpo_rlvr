@@ -74,6 +74,28 @@ $$\hat{D}_{\mathrm{KL}}^{(k_3)}(i, t) = \exp(\log r_{i,t}) - \log r_{i,t} - 1 \g
 
 ---
 
+## 📊 Empirical Results & Diagnostics
+
+### Dataset & Space-Size Gate
+Exhaustive enumeration over 4 operands (`1..12`) and targets (`1..100`) yields **67,526** solvable `(numbers, target)` pairs, partitioned into disjoint splits:
+* `sft_train`: **2,000** | `grpo_train`: **2,000** | `eval`: **500** (`15.0x` total-to-split ratio).
+
+### Held-Out Evaluation (`n = 500`, `DecoderLLM` `depth=4, hidden_dim=256`, CPU)
+
+| Method | Seed | `Pass@1` (Greedy) | `Pass@8` | Format Rate | Mean Len | Truncation |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **SFT Warmstart (`1200` steps)** | 42 | `0.038` | `0.120` | `0.998` | `45.9` | `0.000` |
+| **SFT Compute-Matched (`+300` steps)** | 42 | `0.040` | `0.122` | `0.998` | `46.2` | `0.000` |
+| **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 42 | `0.032` | `0.098` | `1.000` | `45.9` | — |
+| **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 1337 | `0.042` | `0.086` | `0.998` | `46.1` | — |
+
+### Diagnostic Findings
+* **Format & Stopping Mastery:** SFT warmstart reaches `0.998` format compliance and `0.000` truncation (`MeanLen = 45.9 <= 96`), passing the learnability gate with a `>3x` exploration gap (`Pass@1 = 3.8%` vs. `Pass@8 = 12.0%`).
+* **Zero-Variance Group Bottleneck (`z_std`):** At `Pass@8 = 12.0%` and `G = 8`, `~75%–94%` of prompt groups per batch produce uniform rewards (`z_std`), yielding zero advantage signal on those groups.
+* **Tight KL Anchoring:** With `lr = 1e-4`, `beta_kl = 0.04`, `mu_iters = 2`, and Dr. GRPO `1 / max_new_tokens` (`1 / 96`) scaling, `KL` remained `< 5e-5` (`0.0000` logged) and `clip_frac = 0.000` across all 150 steps—keeping `pi_theta` tightly anchored near `pi_ref` (mean GRPO `Pass@1 = 0.037` vs. `0.040` compute-matched SFT).
+
+---
+
 ## 📁 Repository Structure
 
 ```text
@@ -118,6 +140,16 @@ git clone https://github.com/HamzA-1729/grpo_rlvr.git
 cd grpo_rlvr
 uv sync
 uv run pytest -v
+
+# 1. Generate disjoint Countdown splits (data/*.json)
+uv run python -m grpo_rlvr.data
+
+# 2. Train & evaluate SFT warmstart
+uv run python -m grpo_rlvr.train_sft
+uv run python -m grpo_rlvr.evaluate --checkpoint checkpoints/sft_model.pt
+
+# 3. Train Dr. GRPO RLVR policy
+uv run python -m grpo_rlvr.train_grpo --seed 42
 ```
 
 ---
