@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "grpo-rlvr"
+version = "0.1.0"
+description = "From-scratch PyTorch implementation of Group Relative Policy Optimization (GRPO / Dr. GRPO) with deterministic Verifiable Rewards (RLVR)."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dependencies = [
+    "modern-decoder-llm",
+    "torch>=2.5.0",
+    "pyyaml>=6.0.1",
+    "tqdm>=4.66.0",
+    "numpy>=1.26.0",
+    "matplotlib>=3.8.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.4.0",
+]
+
+[tool.uv.sources]
+modern-decoder-llm = { git = "https://github.com/HamzA-1729/modern_decoder_llm.git", tag = "v0.1.0" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/grpo_rlvr"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
