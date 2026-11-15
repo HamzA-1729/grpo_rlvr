@@ -86,8 +86,8 @@ Exhaustive enumeration over 4 operands (`1..12`) and targets (`1..100`) yields *
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **SFT Warmstart (`1200` steps)** | 42 | `0.038` | `0.120` | `0.998` | `45.9` | `0.000` |
 | **SFT Compute-Matched (`+300` steps)** | 42 | `0.040` | `0.122` | `0.998` | `46.2` | `0.000` |
-| **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 42 | `0.032` | `0.098` | `1.000` | `45.9` | — |
-| **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 1337 | `0.042` | `0.086` | `0.998` | `46.1` | — |
+| **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 42 | `0.032` | `0.098` | `1.000` | `45.9` | `0.000` |
+| **Dr. GRPO (`150` steps, `lr=1e-4, beta_kl=0.04`)** | 1337 | `0.042` | `0.086` | `0.998` | `46.1` | `0.000` |
 
 ### Diagnostic Findings
 * **Format & Stopping Mastery:** SFT warmstart reaches `0.998` format compliance and `0.000` truncation (`MeanLen = 45.9 <= 96`), passing the learnability gate with a `>3x` exploration gap (`Pass@1 = 3.8%` vs. `Pass@8 = 12.0%`).
